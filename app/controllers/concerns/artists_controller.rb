@@ -8,16 +8,23 @@ class ArtistsController < ApplicationController
   end
 
   def new
-    @artist = Artist.new
+    if Preference.create(allow_create_artists: false)
+      redirect_to artists_path, alert: "You do not have permission to create artist."
+    else
+      @artist = Artist.new
+    end
   end
 
   def create
     @artist = Artist.new(artist_params)
-
-    if @artist.save
-      redirect_to @artist
+    if @artist.add_index == false
+      redirect_to artists_path
     else
-      render :new
+      if @artist.save
+        redirect_to @artist
+      else
+        render :new
+      end
     end
   end
 
